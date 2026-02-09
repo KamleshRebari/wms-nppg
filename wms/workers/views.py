@@ -143,44 +143,52 @@ def logout_view(request):
 # ================= REGISTER =================
 def register_view(request):
     if request.method == "POST":
-        username = request.POST.get("username")
-        password = request.POST.get("password")
-        name = request.POST.get("name")
-        mobile = request.POST.get("mobile")
-        dob = request.POST.get("dob")
-        email = request.POST.get("email")
-        photo = request.FILES.get("photo")
+        try:
+            username = request.POST.get("username")
+            password = request.POST.get("password")
+            name = request.POST.get("name")
+            mobile = request.POST.get("mobile")
+            dob = request.POST.get("dob")
+            email = request.POST.get("email")
+            photo = request.FILES.get("photo")
 
-        if User.objects.filter(username=username).exists():
-            return render(request, "register.html", {"error": "Username already exists"})
+            if User.objects.filter(username=username).exists():
+                return render(request, "register.html", {"error": "Username already exists"})
 
-        # Create Django User
-        user = User.objects.create_user(
-            username=username,
-            password=password,
-            first_name=name,
-            email=email or ""
-        )
+            # Create User
+            user = User.objects.create_user(
+                username=username,
+                password=password,
+                first_name=name,
+                email=email or ""
+            )
 
-        # Create Profile
-        UserProfile.objects.create(
-            user=user,
-            mobile=mobile,
-            dob=dob,
-            photo=photo,
-            email=email
-        )
+            # Create Profile
+            UserProfile.objects.create(
+                user=user,
+                mobile=mobile,
+                dob=dob or "2000-01-01",
+                photo=photo,
+                email=email
+            )
 
-        # 🔥 CREATE WORKER AUTOMATICALLY
-        Worker.objects.create(
-            name=name,
-            dob=dob,
-            phone=mobile,
-            email=email,
-            photo=photo
-        )
+            # ✅ SAFE WORKER CREATE
+            Worker.objects.get_or_create(
+                email=email,
+                defaults={
+                    "name": name,
+                    "dob": dob or "2000-01-01",
+                    "phone": mobile,
+                    "photo": photo
+                }
+            )
 
-        return redirect("login")
+            return redirect("login")
+
+        except Exception as e:
+            return render(request, "register.html", {
+                "error": f"Registration failed: {str(e)}"
+            })
 
     return render(request, "register.html")
 
