@@ -154,7 +154,7 @@ def register_view(request):
         if User.objects.filter(username=username).exists():
             return render(request, "register.html", {"error": "Username already exists"})
 
-        # 1. Create login user
+        # Create Django User
         user = User.objects.create_user(
             username=username,
             password=password,
@@ -162,7 +162,7 @@ def register_view(request):
             email=email or ""
         )
 
-        # 2. Create UserProfile
+        # Create Profile
         UserProfile.objects.create(
             user=user,
             mobile=mobile,
@@ -171,7 +171,7 @@ def register_view(request):
             email=email
         )
 
-        # 3. Create Worker → THIS SHOWS IN ADMIN
+        # 🔥 CREATE WORKER AUTOMATICALLY
         Worker.objects.create(
             name=name,
             dob=dob,
@@ -183,7 +183,6 @@ def register_view(request):
         return redirect("login")
 
     return render(request, "register.html")
-
 
 # ================= USER DASHBOARD =================
 @login_required
