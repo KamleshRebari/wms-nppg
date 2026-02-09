@@ -162,7 +162,7 @@ def register_view(request):
             email=email or ""
         )
 
-        # 2. Create profile
+        # 2. Create UserProfile
         UserProfile.objects.create(
             user=user,
             mobile=mobile,
@@ -171,7 +171,7 @@ def register_view(request):
             email=email
         )
 
-        # 3. Create worker (so admin can see)
+        # 3. Create Worker → THIS SHOWS IN ADMIN
         Worker.objects.create(
             name=name,
             dob=dob,
@@ -183,39 +183,6 @@ def register_view(request):
         return redirect("login")
 
     return render(request, "register.html")
-
-# ================= PROFILE =================
-@login_required
-def profile_view(request):
-    profile, created = UserProfile.objects.get_or_create(
-        user=request.user,
-        defaults={
-            "mobile": "",
-            "dob": "2000-01-01",
-        }
-    )
-
-    if request.method == "POST":
-
-        # Photo (both can change)
-        photo = request.FILES.get("photo")
-        if photo:
-            profile.photo = photo
-
-        # Fields everyone can change
-        profile.dob = request.POST.get("dob")
-        profile.email = request.POST.get("email")
-
-        # Only admin can change name & mobile
-        if request.user.is_staff:
-            request.user.first_name = request.POST.get("name")
-            profile.mobile = request.POST.get("mobile")
-            request.user.save()
-
-        profile.save()
-        return redirect("profile")
-
-    return render(request, "profile.html", {"profile": profile})
 
 
 # ================= USER DASHBOARD =================
