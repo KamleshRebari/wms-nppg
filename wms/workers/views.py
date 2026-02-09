@@ -143,6 +143,9 @@ def logout_view(request):
 # ================= REGISTER =================
 def register_view(request):
     if request.method == "POST":
+
+        debug = []
+
         try:
             username = request.POST.get("username")
             password = request.POST.get("password")
@@ -152,10 +155,14 @@ def register_view(request):
             email = request.POST.get("email")
             photo = request.FILES.get("photo")
 
+            debug.append("1. Data received")
+
             if User.objects.filter(username=username).exists():
                 return render(request, "register.html", {"error": "Username already exists"})
 
-            # Create User
+            debug.append("2. Username free")
+
+            # CREATE DJANGO USER
             user = User.objects.create_user(
                 username=username,
                 password=password,
@@ -163,7 +170,9 @@ def register_view(request):
                 email=email or ""
             )
 
-            # Create Profile
+            debug.append("3. User created")
+
+            # CREATE PROFILE
             UserProfile.objects.create(
                 user=user,
                 mobile=mobile,
@@ -172,25 +181,28 @@ def register_view(request):
                 email=email
             )
 
-            # ✅ SAFE WORKER CREATE
-            Worker.objects.get_or_create(
+            debug.append("4. Profile created")
+
+            # CREATE WORKER
+            Worker.objects.create(
+                name=name,
+                dob=dob or "2000-01-01",
+                phone=mobile,
                 email=email,
-                defaults={
-                    "name": name,
-                    "dob": dob or "2000-01-01",
-                    "phone": mobile,
-                    "photo": photo
-                }
+                photo=photo
             )
+
+            debug.append("5. Worker created")
 
             return redirect("login")
 
         except Exception as e:
             return render(request, "register.html", {
-                "error": f"Registration failed: {str(e)}"
+                "error": f"CRASH POINT: {debug} → ERROR: {str(e)}"
             })
 
     return render(request, "register.html")
+
 
 # ================= USER DASHBOARD =================
 @login_required
