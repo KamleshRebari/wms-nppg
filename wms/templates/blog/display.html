@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-5">
+
+    <h1>Attendance Records</h1>
+    <h4 style="text-align:center;">Date: {{ today }}</h4>
+
+
+
+    <!-- SLOT 1 -->
+    <div class="card">
+        <div class="card-header">
+            Slot 1 (9:00 - 10:00)
+        </div>
+        <div class="card-body">
+            {% if slot1 %}
+                <ul>
+                    {% for rec in slot1 %}
+                        <li>{{ rec.worker.name }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No one present in this slot.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- SLOT 2 -->
+    <div class="card">
+        <div class="card-header">
+            Slot 2 (1:00 - 2:00)
+        </div>
+        <div class="card-body">
+            {% if slot2 %}
+                <ul>
+                    {% for rec in slot2 %}
+                        <li>{{ rec.worker.name }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No one present in this slot.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- SLOT 3 -->
+    <div class="card">
+        <div class="card-header">
+            Slot 3 (4:00 - 5:00)
+        </div>
+        <div class="card-body">
+            {% if slot3 %}
+                <ul>
+                    {% for rec in slot3 %}
+                        <li>{{ rec.worker.name }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No one present in this slot.</p>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+<div class="download-bar">
+    <a href="{% url 'download_attendance' %}" class="download-btn">
+        ⬇ Download Attendance
+    </a>
+</div>
+
+{% endblock %}

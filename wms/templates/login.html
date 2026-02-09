@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NPPG Login</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+
+<div class="login-wrapper">
+
+    <div class="login-card-premium">
+
+        <div class="login-title">
+            <h1>Welcome to NPPG</h1>
+            <p>Worker Management System</p>
+        </div>
+
+        {% if error %}
+            <p class="login-error">{{ error }}</p>
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <!-- LOGIN TYPE -->
+            <div class="form-group" style="text-align:center;">
+                <label><strong>Login As</strong></label>
+                <div style="display:flex; justify-content:center; gap:30px; margin-top:8px;">
+                    <label>
+                        <input type="radio" name="login_type" value="user" checked>
+                        User
+                    </label>
+                    <label>
+                        <input type="radio" name="login_type" value="admin">
+                        Admin
+                    </label>
+                </div>
+            </div>
+
+            <!-- USERNAME -->
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" class="form-control" required>
+            </div>
+
+            <!-- PASSWORD -->
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" class="form-control" required>
+            </div>
+
+            <button class="btn btn-primary login-btn-full">
+                Login
+            </button>
+
+            <p style="text-align:center; margin-top:12px;">
+                New user? <a href="{% url 'register' %}">Register</a>
+            </p>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

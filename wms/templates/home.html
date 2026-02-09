@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-5">
+
+    <h2>Mark Attendance</h2>
+
+    <!-- SLOT STATUS MESSAGE -->
+    {% if active_slot %}
+        <div class="alert alert-success" style="text-align:center;">
+            You are marking attendance for <b> {{ active_slot }}</b>
+        </div>
+    {% else %}
+        <div class="alert alert-danger" style="text-align:center;">
+            ❌ No active attendance slot right now.
+        </div>
+    {% endif %}
+
+    {% if error %}
+        <div class="alert alert-danger" style="text-align:center;">
+            {{ error }}
+        </div>
+    {% endif %}
+
+    <!-- ATTENDANCE FORM -->
+    <div class="card">
+
+        <div class="card-header">
+            Workers Attendance
+        </div>
+
+        <div class="card-body">
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Sr. No</th>
+                            <th>Worker Name</th>
+                            <th>Present</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        {% for worker in workers %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ worker.name }}</td>
+                            <td>
+                                <input type="checkbox" name="present_{{ worker.id }}">
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+
+                <!-- SUBMIT BUTTON -->
+                <div style="text-align:center;">
+
+                    {% if active_slot %}
+                        <button type="submit" class="btn btn-primary">
+                            Save Attendance
+                        </button>
+                    {% else %}
+                        <button type="button" class="btn btn-primary" disabled>
+                            Attendance Closed
+                        </button>
+                    {% endif %}
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

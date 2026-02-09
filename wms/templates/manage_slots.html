@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-5">
+
+    <h2>Manage Attendance Time Slots</h2>
+
+    <div class="card">
+
+        <div class="card-header">
+            Slot Settings
+        </div>
+
+        <div class="card-body">
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <table class="table table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>Slot Name</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Active</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for slot in slots %}
+                        <tr>
+                            <td><b>{{ slot.name }}</b></td>
+
+                            <td>
+                                <input type="time"
+                                       class="form-control"
+                                       name="start_{{ slot.id }}"
+                                       value="{{ slot.start_time|time:'H:i' }}">
+                            </td>
+
+                            <td>
+                                <input type="time"
+                                       class="form-control"
+                                       name="end_{{ slot.id }}"
+                                       value="{{ slot.end_time|time:'H:i' }}">
+                            </td>
+
+                            <td>
+                                <input type="checkbox"
+                                       name="active_{{ slot.id }}"
+                                       {% if slot.is_active %}checked{% endif %}>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <div style="text-align:center; margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary">
+                        Save Slot Settings
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

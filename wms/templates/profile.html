@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-5">
+
+    <div class="card">
+
+        <div class="card-header">
+            My Profile
+        </div>
+
+        <div class="card-body">
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div style="text-align:center;">
+
+                    {% if profile.photo %}
+                        <img src="{{ profile.photo.url }}" 
+                             style="width:120px; height:120px; border-radius:50%; object-fit:cover; margin-bottom:15px;">
+                    {% else %}
+                        <div style="font-size:80px; margin-bottom:15px;">👤</div>
+                    {% endif %}
+
+                    <br>
+                    <input type="file" name="photo">
+
+                </div>
+
+                <hr>
+
+                <!-- NAME -->
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" name="name" class="form-control"
+                           value="{{ request.user.first_name }}"
+                           {% if not user.is_staff %} readonly {% endif %}>
+                </div>
+
+                <!-- MOBILE -->
+                <div class="form-group">
+                    <label>Mobile</label>
+                    <input type="text" name="mobile" class="form-control"
+                           value="{{ profile.mobile }}"
+                           {% if not user.is_staff %} readonly {% endif %}>
+                </div>
+
+                <!-- DOB -->
+                <div class="form-group">
+                    <label>Date of Birth</label>
+                    <input type="date" name="dob" class="form-control"
+                           value="{{ profile.dob|date:'Y-m-d' }}">
+                </div>
+
+                <!-- EMAIL -->
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" class="form-control"
+                           value="{{ profile.email }}">
+                </div>
+
+                <br>
+
+                <button class="btn btn-primary">
+                    Update Profile
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

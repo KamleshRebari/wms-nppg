@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-5">
+
+    <h2>Add Worker</h2>
+
+    <div class="card">
+
+
+        <div class="card-body">
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <input name="name" placeholder="Name" required class="form-control mb-2">
+                <input type="date" name="dob" required class="form-control mb-2">
+                <input name="phone" placeholder="Mobile" required class="form-control mb-2">
+                <input type="email" name="email" placeholder="Email" class="form-control mb-2">
+                <input type="file" name="photo" class="form-control mb-2">
+
+                <button class="btn btn-primary">Add Worker</button>
+
+            </form>
+
+        </div>
+    </div>
+
+    <h3>All Workers</h3>
+
+    <table class="table table-bordered text-center">
+        <tr>
+            <th>Photo</th>
+            <th>Name</th>
+            <th>Mobile</th>
+            <th>DOB</th>
+            <th>Email</th>
+            <th>Action</th>
+        </tr>
+
+        {% for w in workers %}
+        <tr>
+            <td>
+                {% if w.photo %}
+                    <img src="{{ w.photo.url }}" width="40" height="40" style="border-radius:50%;">
+                {% else %}
+                    👤
+                {% endif %}
+            </td>
+            <td>{{ w.name }}</td>
+            <td>{{ w.phone }}</td>
+            <td>{{ w.dob }}</td>
+            <td>{{ w.email|default:"-" }}</td>
+            <td>
+                <a href="{% url 'edit_worker' w.id %}" class="btn btn-sm btn-warning">Edit</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,62 @@
+{# ================= TOP TITLE BAR ================= #}
+<div class="top-title-bar">
+    <div class="top-title-inner">
+
+        <div class="app-title">
+            Worker Management System
+        </div>
+
+        {% if user.is_authenticated %}
+        <div class="profile-box" id="profileBox">
+
+            {% if user.userprofile.photo %}
+    <img src="{{ user.userprofile.photo.url }}" class="profile-img">
+{% else %}
+    <div class="profile-img-fallback">👤</div>
+{% endif %}
+
+
+            <span class="profile-name">
+                {{ user.first_name|default:user.username }}
+            </span>
+
+            <div class="profile-dropdown" id="profileDropdown">
+               <a href="{% url 'profile' %}">My Profile</a>
+
+                <a href="{% url 'logout' %}">Logout</a>
+            </div>
+
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+
+{# ================= MENU BAR ================= #}
+<nav class="menu-navbar">
+    <ul class="menu-nav">
+
+        {% if user.is_staff %}
+            {# ========== ADMIN MENU ========== #}
+
+            {% if request.resolver_match.url_name != 'home' %}
+                <li><a href="{% url 'home' %}">Home</a></li>
+            {% endif %}
+
+            <li><a href="{% url 'add_worker' %}">Add Worker</a></li>
+            <li><a href="{% url 'display' %}">Records</a></li>
+
+        {% else %}
+            {# ========== USER MENU ========== #}
+
+            <li><a href="{% url 'user_dashboard' %}">My Attendance</a></li>
+            <li><a href="{% url 'profile' %}">My Profile</a></li>
+
+        {% endif %}
+{% if user.is_staff %}
+    <li><a href="{% url 'manage_slots' %}">Manage Slots</a></li>
+{% endif %}
+
+    </ul>
+</nav>
