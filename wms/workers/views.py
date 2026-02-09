@@ -151,9 +151,17 @@ def register_view(request):
         email = request.POST.get("email")
         photo = request.FILES.get("photo")
 
+        # Username check
         if User.objects.filter(username=username).exists():
             return render(request, "register.html", {"error": "Username already exists"})
 
+        # Email check
+        if UserProfile.objects.filter(email=email).exists():
+            return render(request, "register.html", {
+                "error": "This email is already registered"
+            })
+
+        # Create Django User
         user = User.objects.create_user(
             username=username,
             password=password,
@@ -161,13 +169,26 @@ def register_view(request):
             email=email or ""
         )
 
-        UserProfile.objects.create(
+        # Create Profile
+        profile = UserProfile.objects.create(
             user=user,
             mobile=mobile,
             dob=dob,
             photo=photo,
             email=email
         )
+
+        # ----- CREATE WORKER AUTOMATICALLY -----
+        from .models import Worker
+
+        if not Worker.objects.filter(email=email).exists():
+            Worker.objects.create(
+                name=name,
+                dob=dob,
+                phone=mobile,
+                email=email,
+                photo=photo
+            )
 
         return redirect("login")
 
@@ -211,8 +232,23 @@ def profile_view(request):
 # ================= USER DASHBOARD =================
 @login_required
 def user_dashboard(request):
-    records = Attendance.objects.filter(worker__name=request.user.first_name).order_by("-date")
-    return render(request, "user_dashboard.html", {"records": records})
+
+    # Find worker using email (reliable key)
+    worker = Worker.objects.filter(email=request.user.email).first()
+
+    if not worker:
+        return render(request, "user_dashboard.html", {
+            "records": [],
+            "error": "Your worker profile is not linked. Contact admin."
+        })
+
+    records = Attendance.objects.filter(
+        worker=worker
+    ).order_by("-date")
+
+    return render(request, "user_dashboard.html", {
+        "records": records
+    })
 
 
 # ================= DOWNLOAD ATTENDANCE PDF =================
