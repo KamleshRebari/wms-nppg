@@ -15,7 +15,7 @@ urlpatterns = [
 
     path('user/', views.user_dashboard, name='user_dashboard'),
 
-    path('edit/<int:worker_id>/', views.edit_worker, name='edit_worker'),
+    
 
     path('slots/', views.manage_slots, name='manage_slots'),
 
