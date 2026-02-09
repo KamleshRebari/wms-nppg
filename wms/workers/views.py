@@ -151,11 +151,10 @@ def register_view(request):
         email = request.POST.get("email")
         photo = request.FILES.get("photo")
 
-        # Prevent duplicate username
         if User.objects.filter(username=username).exists():
             return render(request, "register.html", {"error": "Username already exists"})
 
-        # 1. Create Django User
+        # 1. Create login user
         user = User.objects.create_user(
             username=username,
             password=password,
@@ -163,7 +162,7 @@ def register_view(request):
             email=email or ""
         )
 
-        # 2. Create UserProfile
+        # 2. Create profile
         UserProfile.objects.create(
             user=user,
             mobile=mobile,
@@ -172,7 +171,7 @@ def register_view(request):
             email=email
         )
 
-        # 3. CREATE WORKER → THIS MAKES IT VISIBLE TO ADMIN
+        # 3. Create worker (so admin can see)
         Worker.objects.create(
             name=name,
             dob=dob,
@@ -184,7 +183,6 @@ def register_view(request):
         return redirect("login")
 
     return render(request, "register.html")
-
 
 # ================= PROFILE =================
 @login_required
@@ -222,9 +220,9 @@ def profile_view(request):
 
 # ================= USER DASHBOARD =================
 @login_required
+@login_required
 def user_dashboard(request):
 
-    # Find worker using email (reliable key)
     worker = Worker.objects.filter(email=request.user.email).first()
 
     if not worker:
@@ -240,6 +238,7 @@ def user_dashboard(request):
     return render(request, "user_dashboard.html", {
         "records": records
     })
+
 
 
 # ================= DOWNLOAD ATTENDANCE PDF =================
