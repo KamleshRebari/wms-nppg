@@ -70,6 +70,30 @@ def add_worker(request):
     return render(request, "add_worker.html", {"workers": workers})
 
 
+# ================= DISPLAY / RECORDS (ADMIN ONLY) =================
+@login_required
+def display(request):
+    if not request.user.is_staff:
+        return HttpResponseForbidden("You are not allowed here.")
+
+    today = date.today()
+
+    records = Attendance.objects.filter(date=today, present=True).select_related("worker")
+
+    slot1 = records.filter(slot=1)
+    slot2 = records.filter(slot=2)
+    slot3 = records.filter(slot=3)
+
+    context = {
+        "today": today,
+        "slot1": slot1,
+        "slot2": slot2,
+        "slot3": slot3,
+    }
+
+    return render(request, "blog/display.html", context)
+
+
 # ================= LOGIN =================
 def login_view(request):
     if request.method == "POST":
@@ -120,8 +144,6 @@ def register_view(request):
             email = request.POST.get("email")
             photo = request.FILES.get("photo")
 
-            debug.append("1. Data received")
-
             if User.objects.filter(username=username).exists():
                 return render(request, "register.html", {"error": "Username already exists"})
 
@@ -132,8 +154,6 @@ def register_view(request):
                 email=email or ""
             )
 
-            debug.append("2. User created")
-
             UserProfile.objects.create(
                 user=user,
                 mobile=mobile,
@@ -141,8 +161,6 @@ def register_view(request):
                 photo=photo,
                 email=email
             )
-
-            debug.append("3. Profile created")
 
             Worker.objects.create(
                 name=name,
@@ -152,13 +170,11 @@ def register_view(request):
                 photo=photo
             )
 
-            debug.append("4. Worker created")
-
             return redirect("login")
 
         except Exception as e:
             return render(request, "register.html", {
-                "error": f"CRASH POINT: {debug} → ERROR: {str(e)}"
+                "error": f"ERROR: {str(e)}"
             })
 
     return render(request, "register.html")
