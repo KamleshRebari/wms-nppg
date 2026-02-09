@@ -151,17 +151,11 @@ def register_view(request):
         email = request.POST.get("email")
         photo = request.FILES.get("photo")
 
-        # Username check
+        # Prevent duplicate username
         if User.objects.filter(username=username).exists():
             return render(request, "register.html", {"error": "Username already exists"})
 
-        # Email check
-        if UserProfile.objects.filter(email=email).exists():
-            return render(request, "register.html", {
-                "error": "This email is already registered"
-            })
-
-        # Create Django User
+        # 1. Create Django User
         user = User.objects.create_user(
             username=username,
             password=password,
@@ -169,8 +163,8 @@ def register_view(request):
             email=email or ""
         )
 
-        # Create Profile
-        profile = UserProfile.objects.create(
+        # 2. Create UserProfile
+        UserProfile.objects.create(
             user=user,
             mobile=mobile,
             dob=dob,
@@ -178,17 +172,14 @@ def register_view(request):
             email=email
         )
 
-        # ----- CREATE WORKER AUTOMATICALLY -----
-        from .models import Worker
-
-        if not Worker.objects.filter(email=email).exists():
-            Worker.objects.create(
-                name=name,
-                dob=dob,
-                phone=mobile,
-                email=email,
-                photo=photo
-            )
+        # 3. CREATE WORKER → THIS MAKES IT VISIBLE TO ADMIN
+        Worker.objects.create(
+            name=name,
+            dob=dob,
+            phone=mobile,
+            email=email,
+            photo=photo
+        )
 
         return redirect("login")
 
