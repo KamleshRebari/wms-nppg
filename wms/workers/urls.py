@@ -18,6 +18,7 @@ urlpatterns = [
 
     path('user/', views.user_dashboard, name='user_dashboard'),
 path('make-admin/', views.create_admin, name='create_admin'),
+path('edit/<int:id>/', views.edit_worker, name='edit_worker'),
 
     path('profile/', views.profile_view, name='profile'),
 ]

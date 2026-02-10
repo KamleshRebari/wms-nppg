@@ -271,16 +271,18 @@ def manage_slots(request):
     return render(request, "manage_slots.html", {"slots": slots})
 @login_required
 
-def edit_worker(request, worker_id):
+@login_required
+def edit_worker(request, id):
+
     if not request.user.is_staff:
         return HttpResponseForbidden("Not allowed")
 
-    worker = Worker.objects.get(id=worker_id)
+    worker = Worker.objects.get(id=id)
 
     if request.method == "POST":
         worker.name = request.POST.get("name")
-        worker.phone = request.POST.get("phone")
         worker.dob = request.POST.get("dob")
+        worker.phone = request.POST.get("phone")
         worker.email = request.POST.get("email")
 
         if request.FILES.get("photo"):
@@ -289,9 +291,10 @@ def edit_worker(request, worker_id):
         worker.save()
         return redirect("add_worker")
 
-    return render(request, "edit_worker.html", {"worker": worker})
-from django.contrib.auth.models import User
-from django.http import HttpResponse
+    return render(request, "edit_worker.html", {
+        "worker": worker
+    })
+
 
 @login_required
 def create_admin(request):
