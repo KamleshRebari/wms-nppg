@@ -288,4 +288,4 @@ def edit_worker(request, worker_id):
         worker.save()
         return redirect("add_worker")
 
-    return render(request, "edit_worker.html", {"worker": worker})
+    return render(request, "edit_workers.html", {"worker": worker})
