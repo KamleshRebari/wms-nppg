@@ -290,3 +290,23 @@ def edit_worker(request, worker_id):
         return redirect("add_worker")
 
     return render(request, "edit_worker.html", {"worker": worker})
+from django.contrib.auth.models import User
+from django.http import HttpResponse
+
+@login_required
+def create_admin(request):
+    if not request.user.is_superuser:
+        return HttpResponse("Only superuser can create admin")
+
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        user = User.objects.create_user(username=username, password=password)
+        user.is_staff = True
+        user.is_superuser = True
+        user.save()
+
+        return HttpResponse("Admin created successfully")
+
+    return HttpResponse("Send POST request with username & password")
