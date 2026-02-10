@@ -81,14 +81,26 @@ WSGI_APPLICATION = 'wms.wsgi.application'
 # ===========================================================
 # 🔥🔥🔥 ONLY RENDER POSTGRES – NO SQLITE AT ALL 🔥🔥🔥
 # ===========================================================
+# ============== DATABASE CONFIG ==============
+
+import dj_database_url
 
 DATABASES = {
-    'default': dj_database_url.parse(
-        os.environ.get("postgresql://wms_db_ry7q_user:RtzVHrLWWZFvOwsurtSG5hgc7vDpGA3T@dpg-d64rnmrqhjbs73comuug-a/wms_db_ry7q"),
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    }
+}
+
+# Override with Render PostgreSQL if available
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+if DATABASE_URL:
+    DATABASES["default"] = dj_database_url.parse(
+        DATABASE_URL,
         conn_max_age=600,
         ssl_require=True
     )
-}
 
 # ===========================================================
 
