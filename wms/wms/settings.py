@@ -82,22 +82,21 @@ WSGI_APPLICATION = 'wms.wsgi.application'
 # 🔥🔥🔥 ONLY RENDER POSTGRES – NO SQLITE AT ALL 🔥🔥🔥
 # ===========================================================
 # ============== DATABASE CONFIG ==============
-
-import dj_database_url
 import os
+import dj_database_url
+
+DATABASES = {}
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
-if not DATABASE_URL:
-    raise Exception("❌ DATABASE_URL not found! Add it in Render Environment Variables.")
-
-DATABASES = {
-    "default": dj_database_url.parse(
+if DATABASE_URL:
+    DATABASES["default"] = dj_database_url.parse(
         DATABASE_URL,
         conn_max_age=600,
         ssl_require=True
     )
-}
+else:
+    raise Exception("❌ DATABASE_URL NOT FOUND IN RENDER ENVIRONMENT")
 
 # ===========================================================
 
