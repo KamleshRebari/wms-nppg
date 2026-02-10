@@ -98,7 +98,7 @@ if DATABASE_URL:
         ssl_require=True
     )
 else:
-    raise Exception("❌ DATABASE_URL NOT FOUND IN RENDER ENVIRONMENT")
+    raise Exception("❌ DATABASE_URL NOT FOUND IN RENDER")
 
 # ===========================================================
 

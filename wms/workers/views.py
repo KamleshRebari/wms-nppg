@@ -270,6 +270,7 @@ def manage_slots(request):
 
     return render(request, "manage_slots.html", {"slots": slots})
 @login_required
+
 def edit_worker(request, worker_id):
     if not request.user.is_staff:
         return HttpResponseForbidden("Not allowed")
@@ -279,8 +280,8 @@ def edit_worker(request, worker_id):
     if request.method == "POST":
         worker.name = request.POST.get("name")
         worker.phone = request.POST.get("phone")
-        worker.email = request.POST.get("email")
         worker.dob = request.POST.get("dob")
+        worker.email = request.POST.get("email")
 
         if request.FILES.get("photo"):
             worker.photo = request.FILES.get("photo")
@@ -288,4 +289,4 @@ def edit_worker(request, worker_id):
         worker.save()
         return redirect("add_worker")
 
-    return render(request, "edit_workers.html", {"worker": worker})
+    return render(request, "edit_worker.html", {"worker": worker})
