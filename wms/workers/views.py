@@ -74,24 +74,34 @@ def add_worker(request):
 @login_required
 def display(request):
     try:
-        from datetime import date
-
         today = date.today()
 
-        slot1 = Attendance.objects.filter(date=today, slot=1, present=True).select_related("worker")
-        slot2 = Attendance.objects.filter(date=today, slot=2, present=True).select_related("worker")
-        slot3 = Attendance.objects.filter(date=today, slot=3, present=True).select_related("worker")
+        slots = Slot.objects.filter(is_active=True)
+
+        data = []
+
+        for slot in slots:
+
+            records = Attendance.objects.filter(
+                date=today,
+                slot=slot.id,   # ✅ FIX HERE
+                present=True
+            ).select_related("worker")
+
+            data.append({
+                "slot": slot,
+                "records": records
+            })
 
         return render(request, "display.html", {
             "today": today,
-            "slot1": slot1,
-            "slot2": slot2,
-            "slot3": slot3,
+            "data": data
         })
 
     except Exception as e:
         return HttpResponse(f"ERROR IN VIEW: {e}")
 
+@login_required
 def manage_slots(request):
 
     slots = Slot.objects.all()
@@ -103,10 +113,8 @@ def manage_slots(request):
             start = request.POST.get(f"start_{slot.id}")
             end = request.POST.get(f"end_{slot.id}")
 
-            if start:
+            if start and end:
                 slot.start_time = start
-
-            if end:
                 slot.end_time = end
 
             slot.is_active = f"active_{slot.id}" in request.POST
