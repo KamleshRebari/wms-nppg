@@ -112,11 +112,15 @@ def manage_slots(request):
             start = request.POST.get(f"start_{slot.id}")
             end = request.POST.get(f"end_{slot.id}")
 
-            if start and end:
+            # Convert to proper format
+            if start:
                 slot.start_time = start
+
+            if end:
                 slot.end_time = end
 
-            slot.is_active = f"active_{slot.id}" in request.POST
+            slot.is_active = True if request.POST.get(f"active_{slot.id}") else False
+
             slot.save()
 
         return redirect("manage_slots")
@@ -124,6 +128,7 @@ def manage_slots(request):
     return render(request, "manage_slots.html", {
         "slots": slots
     })
+
 
 # ================= LOGIN =================
 def login_view(request):
