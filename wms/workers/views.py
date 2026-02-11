@@ -71,7 +71,6 @@ def add_worker(request):
 
 
 # ================= DISPLAY / RECORDS (ADMIN ONLY) =================
-
 @login_required
 def display(request):
     if not request.user.is_staff:
@@ -79,27 +78,24 @@ def display(request):
 
     today = date.today()
 
-    records = Attendance.objects.filter(
-        date=today,
-        present=True
-    ).select_related("worker", "slot")
+    try:
+        records = Attendance.objects.filter(
+            date=today,
+            present=True
+        ).select_related("worker", "slot")
 
-    slots = Slot.objects.all().order_by("id")
+        slot1 = records.filter(slot__id=1)
+        slot2 = records.filter(slot__id=2)
+        slot3 = records.filter(slot__id=3)
 
-    slot_data = []
+    except Exception as e:
+        return HttpResponse(f"ERROR IN VIEW: {str(e)}")
 
-    for slot in slots:
-        slot_records = records.filter(slot=slot)
-
-        slot_data.append({
-            "slot": slot,
-            "records": slot_records,
-            "count": slot_records.count()
-        })
-
-    return render(request, "blog/display.html", {
+    return render(request, "display.html", {
         "today": today,
-        "slot_data": slot_data
+        "slot1": slot1,
+        "slot2": slot2,
+        "slot3": slot3,
     })
 
 # ================= LOGIN =================
