@@ -1,55 +1,36 @@
-{% extends "base.html" %}
-{% block content %}
-
-<div class="container mt-5">
-
-<h2>Manage Attendance Time Slots</h2>
-
 <form method="POST">
 {% csrf_token %}
 
-<table class="table table-bordered text-center">
+<table class="table">
+
 <tr>
-    <th>Slot</th>
-    <th>Start Time</th>
-    <th>End Time</th>
-    <th>Active</th>
+<th>Slot</th>
+<th>Start</th>
+<th>End</th>
+<th>Active</th>
 </tr>
 
-{% for slot in slots %}
+{% for s in slots %}
 <tr>
-    <td>{{ slot.name }}</td>
+<td>{{ s.name }}</td>
 
-    <td>
-        <input type="time" 
-               name="start_{{ slot.id }}" 
-               value="{{ slot.start_time|time:'H:i' }}"
-               class="form-control">
-    </td>
+<td>
+<input type="time" name="start_{{ s.id }}" value="{{ s.start_time }}">
+</td>
 
-    <td>
-        <input type="time" 
-               name="end_{{ slot.id }}" 
-               value="{{ slot.end_time|time:'H:i' }}"
-               class="form-control">
-    </td>
+<td>
+<input type="time" name="end_{{ s.id }}" value="{{ s.end_time }}">
+</td>
 
-    <td>
-        <input type="checkbox" 
-               name="active_{{ slot.id }}"
-               {% if slot.is_active %}checked{% endif %}>
-    </td>
+<td>
+<input type="checkbox" name="active_{{ s.id }}" {% if s.is_active %}checked{% endif %}>
+</td>
+
 </tr>
 {% endfor %}
 
 </table>
 
-<button class="btn btn-primary">
-    Save Slot Settings
-</button>
+<button class="btn btn-primary">Save</button>
 
 </form>
-
-</div>
-
-{% endblock %}

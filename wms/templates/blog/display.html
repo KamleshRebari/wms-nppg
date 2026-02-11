@@ -3,47 +3,38 @@
 
 <div class="container mt-5">
 
-    <h1>Attendance Records</h1>
-    <h4 style="text-align:center;">Date: {{ today }}</h4>
+<h1>Attendance Records</h1>
+<h4>Date: {{ today }}</h4>
 
-    {% for data in slot_data %}
+<a href="{% url 'download_attendance' %}" class="btn btn-dark mb-3">
+⬇ Download Attendance
+</a>
 
-    <div class="card mb-3">
+{% for d in data %}
 
-        <div class="card-header">
-            Slot {{ data.slot.id }}
-            ({{ data.slot.start_time }} - {{ data.slot.end_time }})
-
-            {% if data.slot.is_active %}
-                <span class="badge bg-success">Active</span>
-            {% else %}
-                <span class="badge bg-secondary">Inactive</span>
-            {% endif %}
-        </div>
-
-        <div class="card-body">
-
-            {% if data.records %}
-                <ul>
-                    {% for rec in data.records %}
-                        <li>{{ rec.worker.name }}</li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>No one present in this slot.</p>
-            {% endif %}
-
-        </div>
-    </div>
-
-    {% endfor %}
-
+<div class="card mb-3">
+<div class="card-header">
+{{ d.slot.name }} ({{ d.slot.start_time }} - {{ d.slot.end_time }})
 </div>
 
-<div class="download-bar">
-    <a href="{% url 'download_attendance' %}" class="download-btn">
-        ⬇ Download Attendance
-    </a>
+<div class="card-body">
+
+{% if d.records %}
+<ul>
+{% for rec in d.records %}
+<li>{{ rec.worker.name }}</li>
+{% endfor %}
+</ul>
+
+{% else %}
+<p>No one present in this slot</p>
+{% endif %}
+
+</div>
+</div>
+
+{% endfor %}
+
 </div>
 
 {% endblock %}
