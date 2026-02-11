@@ -73,29 +73,34 @@ def add_worker(request):
 # ================= DISPLAY / RECORDS (ADMIN ONLY) =================
 @login_required
 def display(request):
-    if not request.user.is_staff:
-        return HttpResponseForbidden("You are not allowed here.")
+    try:
+        today = date.today()
 
-    today = date.today()
+        records = Attendance.objects.filter(
+            date=today,
+            present=True
+        ).select_related("worker")
 
-    records = Attendance.objects.filter(
-        date=today,
-        present=True
-    ).select_related("worker", "slot")
+        # Slot wise filter
+        slot1 = records.filter(slot=1)
+        slot2 = records.filter(slot=2)
+        slot3 = records.filter(slot=3)
 
-    # ===== PURANA SLOTWISE LOGIC =====
-    slot1 = records.filter(slot__name__icontains="1")
-    slot2 = records.filter(slot__name__icontains="2")
-    slot3 = records.filter(slot__name__icontains="3")
+        # Slots table se timings
+        slots = Slot.objects.all()
 
-    context = {
-        "today": today,
-        "slot1": slot1,
-        "slot2": slot2,
-        "slot3": slot3,
-    }
+        context = {
+            "today": today,
+            "slot1": slot1,
+            "slot2": slot2,
+            "slot3": slot3,
+            "slots": slots,
+        }
 
-    return render(request, "blog/display.html", context)
+        return render(request, "blog/display.html", context)
+
+    except Exception as e:
+        return HttpResponse(f"ERROR IN VIEW: {str(e)}")
 
 @login_required
 def manage_slots(request):
