@@ -345,3 +345,40 @@ def create_admin(request):
         return HttpResponse("Admin created successfully")
 
     return HttpResponse("Send POST request with username & password")
+
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from django.http import HttpResponse
+
+@login_required
+def download_attendance(request):
+
+    today = date.today()
+
+    records = Attendance.objects.filter(date=today, present=True).select_related("worker")
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="attendance_{today}.pdf"'
+
+    p = canvas.Canvas(response, pagesize=A4)
+
+    p.setFont("Helvetica-Bold", 14)
+    p.drawString(200, 800, f"Attendance Report - {today}")
+
+    y = 760
+    p.setFont("Helvetica", 12)
+
+    if not records:
+        p.drawString(100, y, "No attendance marked today.")
+    else:
+        for r in records:
+            text = f"{r.worker.name}  |  Slot: {r.slot}"
+            p.drawString(100, y, text)
+            y -= 25
+
+            if y < 50:
+                p.showPage()
+                y = 800
+
+    p.save()
+    return response
