@@ -123,7 +123,6 @@ def manage_slots(request):
     return render(request, "manage_slots.html", {
         "slots": slots
     })
-
 # ================= LOGIN =================
 def login_view(request):
     if request.method == "POST":
