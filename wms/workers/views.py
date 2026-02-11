@@ -76,27 +76,55 @@ def display(request):
     if not request.user.is_staff:
         return HttpResponseForbidden("You are not allowed here.")
 
-    today = date.today()
-
     try:
+        today = date.today()
+
+        # Sirf present records
         records = Attendance.objects.filter(
             date=today,
             present=True
-        ).select_related("worker", "slot")
+        ).select_related("worker")
 
-        slot1 = records.filter(slot__id=1)
-        slot2 = records.filter(slot__id=2)
-        slot3 = records.filter(slot__id=3)
+        # INTEGER SLOT FIX
+        slot1 = records.filter(slot=1)
+        slot2 = records.filter(slot=2)
+        slot3 = records.filter(slot=3)
+
+        # ===== MANAGE SLOT PART (PURANA LOGIC) =====
+        slots = Slot.objects.all()
+
+        if request.method == "POST":
+            for s in slots:
+                start_val = request.POST.get(f"start_{s.id}")
+                end_val = request.POST.get(f"end_{s.id}")
+                active_val = request.POST.get(f"active_{s.id}")
+
+                if start_val and end_val:
+                    s.start_time = start_val
+                    s.end_time = end_val
+
+                s.is_active = True if active_val else False
+                s.save()
+
+            return redirect("display")
+
+        context = {
+            "today": today,
+
+            # Records part
+            "slot1": slot1,
+            "slot2": slot2,
+            "slot3": slot3,
+
+            # Manage slots part
+            "slots": slots,
+        }
+
+        return render(request, "blog/display.html", context)
 
     except Exception as e:
         return HttpResponse(f"ERROR IN VIEW: {str(e)}")
 
-    return render(request, "display.html", {
-        "today": today,
-        "slot1": slot1,
-        "slot2": slot2,
-        "slot3": slot3,
-    })
 
 # ================= LOGIN =================
 def login_view(request):
