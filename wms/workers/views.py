@@ -104,18 +104,21 @@ def display(request):
 @login_required
 def manage_slots(request):
 
+    if not request.user.is_staff:
+        return HttpResponseForbidden("Not allowed")
+
     slots = Slot.objects.all()
 
     if request.method == "POST":
 
         for slot in slots:
 
-            start = request.POST.get(f"start_{slot.id}")
-            end = request.POST.get(f"end_{slot.id}")
+            start_val = request.POST.get(f"start_{slot.id}")
+            end_val = request.POST.get(f"end_{slot.id}")
 
-            if start and end:
-                slot.start_time = start
-                slot.end_time = end
+            if start_val and end_val:
+                slot.start_time = start_val
+                slot.end_time = end_val
 
             slot.is_active = f"active_{slot.id}" in request.POST
 

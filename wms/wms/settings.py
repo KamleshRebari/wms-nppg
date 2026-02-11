@@ -19,6 +19,8 @@ DEBUG = False   # 👈 IMPORTANT FOR RENDER
 ALLOWED_HOSTS = ['*']
 
 # ================= STATIC =================
+WHITENOISE_USE_FINDERS = True
+
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [

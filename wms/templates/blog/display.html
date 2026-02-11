@@ -1,43 +1,40 @@
 {% extends 'base.html' %}
 {% block content %}
 
-{% load static %}
-
-
-
 <div class="container mt-5">
 
 <h1>Attendance Records</h1>
 <h4>Date: {{ today }}</h4>
 
-<a href="{% url 'download_attendance' %}" class="btn btn-dark mb-3">
-⬇ Download Attendance
-</a>
-
-{% for d in data %}
+{% for item in data %}
 
 <div class="card mb-3">
-<div class="card-header">
-{{ d.slot.name }} ({{ d.slot.start_time }} - {{ d.slot.end_time }})
+    <div class="card-header">
+        {{ item.slot.name }} ({{ item.slot.start_time }} - {{ item.slot.end_time }})
+    </div>
+
+    <div class="card-body">
+
+        {% if item.records %}
+            <ul>
+                {% for rec in item.records %}
+                    <li>{{ rec.worker.name }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No one present in this slot.</p>
+        {% endif %}
+
+    </div>
 </div>
 
-<div class="card-body">
-
-{% if d.records %}
-<ul>
-{% for rec in d.records %}
-<li>{{ rec.worker.name }}</li>
 {% endfor %}
-</ul>
 
-{% else %}
-<p>No one present in this slot</p>
-{% endif %}
-
+<div class="mt-4">
+    <a href="{% url 'download_attendance' %}" class="btn btn-success">
+        Download Attendance PDF
+    </a>
 </div>
-</div>
-
-{% endfor %}
 
 </div>
 
