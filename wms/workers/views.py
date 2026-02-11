@@ -73,31 +73,26 @@ def add_worker(request):
 # ================= DISPLAY / RECORDS (ADMIN ONLY) =================
 @login_required
 def display(request):
+    try:
+        from datetime import date
 
-    from datetime import date
-    from .models import Attendance, Slot
+        today = date.today()
 
-    today = date.today()
+        # Slot 1,2,3 ke hisab se filter
+        slot1 = Attendance.objects.filter(date=today, slot=1, present=True).select_related("worker")
+        slot2 = Attendance.objects.filter(date=today, slot=2, present=True).select_related("worker")
+        slot3 = Attendance.objects.filter(date=today, slot=3, present=True).select_related("worker")
 
-    slots = Slot.objects.filter(is_active=True)
-
-    data = []
-
-    for slot in slots:
-        records = Attendance.objects.filter(
-            date=today,
-            slot=slot
-        ).select_related("worker")
-
-        data.append({
-            "slot": slot,
-            "records": records
+        return render(request, "display.html", {
+            "today": today,
+            "slot1": slot1,
+            "slot2": slot2,
+            "slot3": slot3,
         })
 
-    return render(request, "display.html", {
-        "today": today,
-        "data": data
-    })
+    except Exception as e:
+        return HttpResponse(f"ERROR IN VIEW: {e}")
+
 
 @login_required
 def manage_slots(request):
@@ -107,9 +102,18 @@ def manage_slots(request):
     if request.method == "POST":
 
         for slot in slots:
-            slot.start_time = request.POST.get(f"start_{slot.id}")
-            slot.end_time = request.POST.get(f"end_{slot.id}")
+
+            start = request.POST.get(f"start_{slot.id}")
+            end = request.POST.get(f"end_{slot.id}")
+
+            if start:
+                slot.start_time = start
+
+            if end:
+                slot.end_time = end
+
             slot.is_active = f"active_{slot.id}" in request.POST
+
             slot.save()
 
         return redirect("manage_slots")
