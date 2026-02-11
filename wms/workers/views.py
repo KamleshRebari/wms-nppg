@@ -78,7 +78,6 @@ def display(request):
 
         today = date.today()
 
-        # Slot 1,2,3 ke hisab se filter
         slot1 = Attendance.objects.filter(date=today, slot=1, present=True).select_related("worker")
         slot2 = Attendance.objects.filter(date=today, slot=2, present=True).select_related("worker")
         slot3 = Attendance.objects.filter(date=today, slot=3, present=True).select_related("worker")
@@ -93,8 +92,6 @@ def display(request):
     except Exception as e:
         return HttpResponse(f"ERROR IN VIEW: {e}")
 
-
-@login_required
 def manage_slots(request):
 
     slots = Slot.objects.all()
