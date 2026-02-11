@@ -76,55 +76,53 @@ def display(request):
     if not request.user.is_staff:
         return HttpResponseForbidden("You are not allowed here.")
 
-    try:
-        today = date.today()
+    today = date.today()
 
-        # Sirf present records
-        records = Attendance.objects.filter(
-            date=today,
-            present=True
-        ).select_related("worker")
+    records = Attendance.objects.filter(
+        date=today,
+        present=True
+    ).select_related("worker", "slot")
 
-        # INTEGER SLOT FIX
-        slot1 = records.filter(slot=1)
-        slot2 = records.filter(slot=2)
-        slot3 = records.filter(slot=3)
+    # ===== PURANA SLOTWISE LOGIC =====
+    slot1 = records.filter(slot__name__icontains="1")
+    slot2 = records.filter(slot__name__icontains="2")
+    slot3 = records.filter(slot__name__icontains="3")
 
-        # ===== MANAGE SLOT PART (PURANA LOGIC) =====
-        slots = Slot.objects.all()
+    context = {
+        "today": today,
+        "slot1": slot1,
+        "slot2": slot2,
+        "slot3": slot3,
+    }
 
-        if request.method == "POST":
-            for s in slots:
-                start_val = request.POST.get(f"start_{s.id}")
-                end_val = request.POST.get(f"end_{s.id}")
-                active_val = request.POST.get(f"active_{s.id}")
+    return render(request, "blog/display.html", context)
 
-                if start_val and end_val:
-                    s.start_time = start_val
-                    s.end_time = end_val
+@login_required
+def manage_slots(request):
+    if not request.user.is_staff:
+        return HttpResponseForbidden("Not allowed")
 
-                s.is_active = True if active_val else False
-                s.save()
+    slots = Slot.objects.all()
 
-            return redirect("display")
+    if request.method == "POST":
+        for slot in slots:
 
-        context = {
-            "today": today,
+            start_val = request.POST.get(f"start_{slot.id}")
+            end_val = request.POST.get(f"end_{slot.id}")
+            active_val = request.POST.get(f"active_{slot.id}")
 
-            # Records part
-            "slot1": slot1,
-            "slot2": slot2,
-            "slot3": slot3,
+            if start_val and end_val:
+                slot.start_time = start_val
+                slot.end_time = end_val
 
-            # Manage slots part
-            "slots": slots,
-        }
+            slot.is_active = True if active_val else False
+            slot.save()
 
-        return render(request, "blog/display.html", context)
+        return redirect("manage_slots")
 
-    except Exception as e:
-        return HttpResponse(f"ERROR IN VIEW: {str(e)}")
-
+    return render(request, "manage_slots.html", {
+        "slots": slots
+    })
 
 # ================= LOGIN =================
 def login_view(request):
