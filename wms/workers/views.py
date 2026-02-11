@@ -73,39 +73,35 @@ def add_worker(request):
 # ================= DISPLAY / RECORDS (ADMIN ONLY) =================
 @login_required
 def display(request):
-    try:
-        today = date.today()
+    from datetime import date
+    from .models import Attendance, Slot
 
-        slots = Slot.objects.filter(is_active=True)
+    today = date.today()
 
-        data = []
+    slots = Slot.objects.all()
 
-        for slot in slots:
+    data = []
 
-            records = Attendance.objects.filter(
-                date=today,
-                slot=slot.id,   # ✅ FIX HERE
-                present=True
-            ).select_related("worker")
+    for slot in slots:
+        records = Attendance.objects.filter(
+            date=today,
+            slot=slot.id,
+            present=True
+        ).select_related("worker")
 
-            data.append({
-                "slot": slot,
-                "records": records
-            })
-
-        return render(request, "display.html", {
-            "today": today,
-            "data": data
+        data.append({
+            "slot": slot,
+            "records": records
         })
 
-    except Exception as e:
-        return HttpResponse(f"ERROR IN VIEW: {e}")
+    return render(request, "blog/display.html", {
+        "today": today,
+        "data": data
+    })
+
 
 @login_required
 def manage_slots(request):
-
-    if not request.user.is_staff:
-        return HttpResponseForbidden("Not allowed")
 
     slots = Slot.objects.all()
 
@@ -113,15 +109,14 @@ def manage_slots(request):
 
         for slot in slots:
 
-            start_val = request.POST.get(f"start_{slot.id}")
-            end_val = request.POST.get(f"end_{slot.id}")
+            start = request.POST.get(f"start_{slot.id}")
+            end = request.POST.get(f"end_{slot.id}")
 
-            if start_val and end_val:
-                slot.start_time = start_val
-                slot.end_time = end_val
+            if start and end:
+                slot.start_time = start
+                slot.end_time = end
 
             slot.is_active = f"active_{slot.id}" in request.POST
-
             slot.save()
 
         return redirect("manage_slots")
